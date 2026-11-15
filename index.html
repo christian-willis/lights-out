@@ -296,6 +296,31 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: bloc
 @media (prefers-reduced-motion: reduce) { .lamps i, .banner, .radio, .panel, .toast, .bc-flag, .screen-frame.flash { animation: none; } .tower li { transition: none; } }
 #heroFrame #scene { aspect-ratio: auto; height: clamp(170px, 42vw, 380px); object-fit: cover; object-position: center 92%; }
 
+/* ---------- modes + championship gate ---------- */
+.modes { display: flex; gap: 0; margin: 0 auto 10px; width: fit-content; max-width: 100%; background: #000; padding: 3px; box-shadow: 0 0 0 2px var(--line); }
+.mode { font-family: var(--pix); font-size: 8px; letter-spacing: 1px; padding: 10px 12px; background: transparent; border: 0; color: var(--dim); display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.mode.on { background: var(--panel2); color: #fff; box-shadow: inset 0 -3px 0 var(--red); }
+.mode .star { font-style: normal; color: var(--yellow); }
+.mode:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.gate { background: var(--panel); border: 2px solid var(--line); border-top: 4px solid var(--yellow); padding: 18px 16px; text-align: center; }
+.gate h2 { font-family: var(--pix); font-weight: 400; font-size: clamp(13px, 3.4vw, 18px); letter-spacing: 2px; margin: 0 0 10px; }
+.gate-lead { max-width: 520px; margin: 0 auto; color: #d7dbe3; }
+.gate-status { font-family: var(--pix); font-size: 8px; line-height: 1.7; color: var(--yellow); margin: 14px 0 0; }
+.offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin: 16px 0 0; text-align: left; }
+.offer { background: #07080b; border: 2px solid var(--line2); padding: 14px; display: grid; gap: 8px; align-content: start; }
+.offer.best { border-color: var(--yellow); }
+.offer.best .chip { border-left-color: var(--yellow); color: var(--yellow); }
+.offer .chip { justify-self: start; }
+.offer b { font-family: var(--pix); font-weight: 400; font-size: 11px; letter-spacing: 1px; }
+.offer strong { font-family: var(--pix); font-weight: 400; font-size: 26px; color: var(--yellow); }
+.offer p { margin: 0; color: var(--dim); font-size: 15px; }
+.code-row { display: flex; gap: 8px; max-width: 420px; margin: 16px auto 0; }
+.code-row input { flex: 1; min-width: 0; font-family: ui-monospace, monospace; font-size: 14px; background: #000; border: 0; border-radius: 0; box-shadow: inset 0 0 0 2px var(--line2); padding: 10px; outline: none; color: var(--green); }
+.code-row input:focus { box-shadow: inset 0 0 0 2px var(--yellow); }
+.gate-msg { color: var(--green); font-weight: 600; margin: 10px 0 0; } .gate-msg:empty { display: none; }
+.gate-fine { color: var(--mute); font-size: 13px; margin: 14px auto 0; max-width: 520px; }
+@media (max-width: 520px) { .mode { font-size: 7px; padding: 10px 8px; } }
+
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' shape-rendering='crispEdges'%3E%3Crect width='10' height='6' fill='%230b0c10'/%3E%3Cpath fill='%23ff1a0a' d='M1 2h1v2H1zM3 2h1v2H3zM5 2h1v2H5zM7 2h1v2H7z'/%3E%3C/svg%3E">
 </head>
@@ -331,6 +356,42 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: bloc
           <div id="heroFrame" class="screen-frame"><canvas id="scene" aria-hidden="true"></canvas></div>
           <div class="hero-tag"><span id="heroRound" class="chip red">ROUND 1</span><b id="heroCity">MELBOURNE</b></div>
         </div>
+        <nav class="modes" role="tablist">
+          <button type="button" role="tab" class="mode on" data-mode="daily" aria-selected="true" data-i18n="mode.daily">DAILY RACE</button>
+          <button type="button" role="tab" class="mode" data-mode="champ" aria-selected="false"><span data-i18n="mode.champ">CHAMPIONSHIP</span> <em class="star">★</em></button>
+        </nav>
+
+        <div id="champGate" class="gate" hidden>
+          <h2 data-i18n="gate.h">CHAMPIONSHIP MODE</h2>
+          <p class="gate-lead" data-i18n="gate.p">All 24 rounds, back to back. No waiting for tomorrow: take the flag, and the next grid is ready. Your points build into a full title fight against the 22 drivers.</p>
+          <p id="gateStatus" class="gate-status"></p>
+          <div class="cta"><button id="champStartBtn" class="btn go" type="button" hidden>START CHAMPIONSHIP ▶</button></div>
+          <div id="gateOffers" class="offers">
+            <div class="offer">
+              <span class="chip" data-i18n="offer.champ.k">ONE SEASON</span>
+              <b data-i18n="offer.champ.b">FULL CHAMPIONSHIP</b>
+              <strong id="priceChamp">£2</strong>
+              <p data-i18n="offer.champ.p">One complete 24-race championship, played at your own pace.</p>
+              <button id="buyChamp" class="btn" type="button">BUY</button>
+            </div>
+            <div class="offer best">
+              <span class="chip" data-i18n="offer.unl.k">BEST VALUE</span>
+              <b data-i18n="offer.unl.b">UNLIMITED</b>
+              <strong id="priceUnl">£5</strong>
+              <p data-i18n="offer.unl.p">Every championship, as many seasons as you like. One payment.</p>
+              <button id="buyUnl" class="btn go" type="button">BUY</button>
+            </div>
+          </div>
+          <form id="codeForm" class="code-row" autocomplete="off">
+            <label class="sr" for="codeIn" data-i18n="gate.code.ph">Unlock code</label>
+            <input id="codeIn" type="text" spellcheck="false" autocapitalize="off" autocomplete="off" data-i18n-ph="gate.code.ph" placeholder="Unlock code">
+            <button class="btn" type="submit" data-i18n="gate.code.btn">UNLOCK</button>
+          </form>
+          <p id="codeMsg" class="gate-msg" role="status"></p>
+          <p class="gate-fine" data-i18n="gate.fine">The daily race is always free. Passes are saved in this browser: copy your save code in Settings to move a pass to another device.</p>
+        </div>
+
+        <div id="raceUI">
         <div class="event">
           <div class="event-map"><canvas id="trackMap" width="220" height="220" aria-hidden="true"></canvas></div>
           <div class="event-info">
@@ -360,6 +421,7 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: bloc
         <div class="cta">
           <button id="startBtn" class="btn go" type="button">GO TO THE GRID ▶</button>
           <button id="reportBtn" class="btn go" type="button" hidden data-i18n="btn.report">RACE REPORT</button>
+        </div>
         </div>
 
         <h2 class="sec-h" data-i18n="how.h">HOW A RACE WEEKEND WORKS</h2>
@@ -533,11 +595,21 @@ canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: bloc
  *              and the game uses the address it is being played at (when that is a
  *              real website).
  * goatcounter  Your GoatCounter site code for visitor and race counts ('' = none).
+ * pay          Championship mode passes. For each pass:
+ *                price  the price shown on the button
+ *                link   the payment page to open (e.g. a Stripe Payment Link). '' = "coming soon"
+ *                code   the fingerprint of that pass's unlock code. The codes themselves, and the
+ *                       address to send buyers back to after paying, are in PAYMENTS.md (keep that
+ *                       file private; it is not part of the website).
  */
 const SITE = {
-  launch: '2026-11-14',
+  launch: '2026-11-15',
   url: 'https://lightsoutgame.co.uk',
   goatcounter: '',
+  pay: {
+    championship: { price: '£2', link: '', code: '5b95047157dced3b210e6332b41cb72a' },
+    unlimited: { price: '£5', link: '', code: '77c7b8ab662bca0ab92a0a7d83d5b49f' },
+  },
 };
 
 </script>
@@ -1074,6 +1146,16 @@ const LANGS = [['en', 'ENGLISH'], ['es', 'ESPAÑOL'], ['fr', 'FRANÇAIS'], ['pt'
 
 const I18N = {
 en: {
+  "mode.daily": "DAILY RACE", "mode.champ": "CHAMPIONSHIP", "ev.round.c": "CHAMPIONSHIP {s} · ROUND {n}/{m}", "st.title.c": "CHAMPIONSHIP {s} STANDINGS", "share.season.c": "Championship {s}: {rank}, {pts} pts",
+  "next.ready": "NEXT ROUND: {city} IS READY", "next.done": "THAT WAS THE FINAL ROUND",
+  "gate.h": "CHAMPIONSHIP MODE", "gate.p": "All 24 rounds, back to back. No waiting for tomorrow: take the flag, and the next grid is ready. Your points build into a full title fight against the 22 drivers.",
+  "gate.none": "YOU NEED A PASS TO START A CHAMPIONSHIP", "gate.credit1": "1 CHAMPIONSHIP READY TO START", "gate.credits": "{n} CHAMPIONSHIPS READY TO START", "gate.unlimited": "UNLIMITED PASS ACTIVE",
+  "gate.done": "CHAMPIONSHIP COMPLETE: YOU FINISHED {rank} WITH {pts} POINTS.", "gate.start": "START CHAMPIONSHIP ▶", "gate.again": "START A NEW CHAMPIONSHIP ▶",
+  "gate.buy": "BUY · {price}", "gate.soon": "COMING SOON", "gate.code.ph": "Unlock code", "gate.code.btn": "UNLOCK",
+  "gate.ok.unl": "Unlimited pass unlocked. Start a championship whenever you like.", "gate.ok.champ": "Championship unlocked. It is ready to start.", "gate.used": "That pass is already active on this device.", "gate.bad": "That code is not recognised.",
+  "gate.fine": "The daily race is always free. Passes are saved in this browser: copy your save code in Settings to move a pass to another device.",
+  "offer.champ.k": "ONE SEASON", "offer.champ.b": "FULL CHAMPIONSHIP", "offer.champ.p": "One complete 24-race championship, played at your own pace.",
+  "offer.unl.k": "BEST VALUE", "offer.unl.b": "UNLIMITED", "offer.unl.p": "Every championship, as many seasons as you like. One payment.",
   "you": "YOU", "round": "ROUND {n}", "on": "ON", "off": "OFF", "skip": "SKIP ▶▶",
   "logo.aria": "Back to the paddock", "sound.aria": "Toggle sound",
   "tab.race": "RACE", "tab.standings": "STANDINGS", "tab.trophies": "TROPHIES", "tab.settings": "SETTINGS",
@@ -1153,6 +1235,16 @@ en: {
 },
 
 es: {
+  "mode.daily": "CARRERA DIARIA", "mode.champ": "CAMPEONATO", "ev.round.c": "CAMPEONATO {s} · RONDA {n}/{m}", "st.title.c": "CAMPEONATO {s} · CLASIFICACIÓN", "share.season.c": "Campeonato {s}: {rank}, {pts} pts",
+  "next.ready": "SIGUIENTE RONDA: {city} ESTÁ LISTA", "next.done": "ESA FUE LA ÚLTIMA RONDA",
+  "gate.h": "MODO CAMPEONATO", "gate.p": "Las 24 rondas, una tras otra. Sin esperar a mañana: cruza la meta y la siguiente parrilla está lista. Tus puntos se suman en una lucha por el título contra los 22 pilotos.",
+  "gate.none": "NECESITAS UN PASE PARA EMPEZAR UN CAMPEONATO", "gate.credit1": "1 CAMPEONATO LISTO PARA EMPEZAR", "gate.credits": "{n} CAMPEONATOS LISTOS PARA EMPEZAR", "gate.unlimited": "PASE ILIMITADO ACTIVO",
+  "gate.done": "CAMPEONATO TERMINADO: ACABASTE {rank} CON {pts} PUNTOS.", "gate.start": "EMPEZAR CAMPEONATO ▶", "gate.again": "EMPEZAR UN NUEVO CAMPEONATO ▶",
+  "gate.buy": "COMPRAR · {price}", "gate.soon": "PRÓXIMAMENTE", "gate.code.ph": "Código de desbloqueo", "gate.code.btn": "DESBLOQUEAR",
+  "gate.ok.unl": "Pase ilimitado desbloqueado. Empieza un campeonato cuando quieras.", "gate.ok.champ": "Campeonato desbloqueado. Está listo para empezar.", "gate.used": "Ese pase ya está activo en este dispositivo.", "gate.bad": "Ese código no se reconoce.",
+  "gate.fine": "La carrera diaria siempre es gratis. Los pases se guardan en este navegador: copia tu código de guardado en Ajustes para llevar un pase a otro dispositivo.",
+  "offer.champ.k": "UNA TEMPORADA", "offer.champ.b": "CAMPEONATO COMPLETO", "offer.champ.p": "Un campeonato completo de 24 carreras, a tu ritmo.",
+  "offer.unl.k": "MEJOR PRECIO", "offer.unl.b": "ILIMITADO", "offer.unl.p": "Todos los campeonatos, tantas temporadas como quieras. Un solo pago.",
   "you": "TÚ", "round": "RONDA {n}", "on": "SÍ", "off": "NO", "skip": "SALTAR ▶▶",
   "logo.aria": "Volver al paddock", "sound.aria": "Activar o silenciar el sonido",
   "tab.race": "CARRERA", "tab.standings": "MUNDIAL", "tab.trophies": "TROFEOS", "tab.settings": "AJUSTES",
@@ -1228,6 +1320,16 @@ es: {
 },
 
 fr: {
+  "mode.daily": "COURSE DU JOUR", "mode.champ": "CHAMPIONNAT", "ev.round.c": "CHAMPIONNAT {s} · MANCHE {n}/{m}", "st.title.c": "CHAMPIONNAT {s} · CLASSEMENT", "share.season.c": "Championnat {s} : {rank}, {pts} pts",
+  "next.ready": "MANCHE SUIVANTE : {city} EST PRÊTE", "next.done": "C’ÉTAIT LA DERNIÈRE MANCHE",
+  "gate.h": "MODE CHAMPIONNAT", "gate.p": "Les 24 manches, à la suite. Pas besoin d’attendre demain : passe le drapeau et la grille suivante est prête. Tes points s’additionnent pour une vraie lutte pour le titre contre les 22 pilotes.",
+  "gate.none": "IL TE FAUT UN PASS POUR LANCER UN CHAMPIONNAT", "gate.credit1": "1 CHAMPIONNAT PRÊT À DÉMARRER", "gate.credits": "{n} CHAMPIONNATS PRÊTS À DÉMARRER", "gate.unlimited": "PASS ILLIMITÉ ACTIF",
+  "gate.done": "CHAMPIONNAT TERMINÉ : TU FINIS {rank} AVEC {pts} POINTS.", "gate.start": "LANCER LE CHAMPIONNAT ▶", "gate.again": "LANCER UN NOUVEAU CHAMPIONNAT ▶",
+  "gate.buy": "ACHETER · {price}", "gate.soon": "BIENTÔT", "gate.code.ph": "Code de déblocage", "gate.code.btn": "DÉBLOQUER",
+  "gate.ok.unl": "Pass illimité débloqué. Lance un championnat quand tu veux.", "gate.ok.champ": "Championnat débloqué. Il est prêt à démarrer.", "gate.used": "Ce pass est déjà actif sur cet appareil.", "gate.bad": "Ce code n’est pas reconnu.",
+  "gate.fine": "La course du jour est toujours gratuite. Les pass sont enregistrés dans ce navigateur : copie ton code de sauvegarde dans Réglages pour transférer un pass sur un autre appareil.",
+  "offer.champ.k": "UNE SAISON", "offer.champ.b": "CHAMPIONNAT COMPLET", "offer.champ.p": "Un championnat complet de 24 courses, à ton rythme.",
+  "offer.unl.k": "MEILLEURE OFFRE", "offer.unl.b": "ILLIMITÉ", "offer.unl.p": "Tous les championnats, autant de saisons que tu veux. Un seul paiement.",
   "you": "TOI", "round": "MANCHE {n}", "on": "OUI", "off": "NON", "skip": "PASSER ▶▶",
   "logo.aria": "Retour au paddock", "sound.aria": "Activer ou couper le son",
   "tab.race": "COURSE", "tab.standings": "CLASSEMENT", "tab.trophies": "TROPHÉES", "tab.settings": "RÉGLAGES",
@@ -1303,6 +1405,16 @@ fr: {
 },
 
 pt: {
+  "mode.daily": "CORRIDA DIÁRIA", "mode.champ": "CAMPEONATO", "ev.round.c": "CAMPEONATO {s} · ETAPA {n}/{m}", "st.title.c": "CAMPEONATO {s} · CLASSIFICAÇÃO", "share.season.c": "Campeonato {s}: {rank}, {pts} pts",
+  "next.ready": "PRÓXIMA ETAPA: {city} ESTÁ PRONTA", "next.done": "ESSA FOI A ÚLTIMA ETAPA",
+  "gate.h": "MODO CAMPEONATO", "gate.p": "As 24 etapas, uma atrás da outra. Sem esperar até amanhã: receba a bandeira e o próximo grid está pronto. Seus pontos se somam em uma briga pelo título contra os 22 pilotos.",
+  "gate.none": "VOCÊ PRECISA DE UM PASSE PARA COMEÇAR UM CAMPEONATO", "gate.credit1": "1 CAMPEONATO PRONTO PARA COMEÇAR", "gate.credits": "{n} CAMPEONATOS PRONTOS PARA COMEÇAR", "gate.unlimited": "PASSE ILIMITADO ATIVO",
+  "gate.done": "CAMPEONATO CONCLUÍDO: VOCÊ TERMINOU EM {rank} COM {pts} PONTOS.", "gate.start": "COMEÇAR CAMPEONATO ▶", "gate.again": "COMEÇAR UM NOVO CAMPEONATO ▶",
+  "gate.buy": "COMPRAR · {price}", "gate.soon": "EM BREVE", "gate.code.ph": "Código de desbloqueio", "gate.code.btn": "DESBLOQUEAR",
+  "gate.ok.unl": "Passe ilimitado desbloqueado. Comece um campeonato quando quiser.", "gate.ok.champ": "Campeonato desbloqueado. Está pronto para começar.", "gate.used": "Esse passe já está ativo neste aparelho.", "gate.bad": "Esse código não foi reconhecido.",
+  "gate.fine": "A corrida diária é sempre grátis. Os passes ficam salvos neste navegador: copie seu código de salvamento em Ajustes para levar um passe a outro aparelho.",
+  "offer.champ.k": "UMA TEMPORADA", "offer.champ.b": "CAMPEONATO COMPLETO", "offer.champ.p": "Um campeonato completo de 24 corridas, no seu ritmo.",
+  "offer.unl.k": "MELHOR OFERTA", "offer.unl.b": "ILIMITADO", "offer.unl.p": "Todos os campeonatos, quantas temporadas você quiser. Um único pagamento.",
   "you": "VOCÊ", "round": "ETAPA {n}", "on": "LIGADO", "off": "DESLIGADO", "skip": "PULAR ▶▶",
   "logo.aria": "Voltar ao paddock", "sound.aria": "Ligar ou desligar o som",
   "tab.race": "CORRIDA", "tab.standings": "CAMPEONATO", "tab.trophies": "TROFÉUS", "tab.settings": "AJUSTES",
@@ -1378,6 +1490,16 @@ pt: {
 },
 
 it: {
+  "mode.daily": "GARA DEL GIORNO", "mode.champ": "CAMPIONATO", "ev.round.c": "CAMPIONATO {s} · GARA {n}/{m}", "st.title.c": "CAMPIONATO {s} · CLASSIFICA", "share.season.c": "Campionato {s}: {rank}, {pts} pti",
+  "next.ready": "PROSSIMA GARA: {city} È PRONTA", "next.done": "ERA L’ULTIMA GARA",
+  "gate.h": "MODALITÀ CAMPIONATO", "gate.p": "Tutte le 24 gare, una dopo l’altra. Senza aspettare domani: prendi la bandiera e la griglia successiva è pronta. I tuoi punti si sommano in una vera lotta per il titolo contro i 22 piloti.",
+  "gate.none": "SERVE UN PASS PER INIZIARE UN CAMPIONATO", "gate.credit1": "1 CAMPIONATO PRONTO A PARTIRE", "gate.credits": "{n} CAMPIONATI PRONTI A PARTIRE", "gate.unlimited": "PASS ILLIMITATO ATTIVO",
+  "gate.done": "CAMPIONATO CONCLUSO: HAI CHIUSO {rank} CON {pts} PUNTI.", "gate.start": "INIZIA IL CAMPIONATO ▶", "gate.again": "INIZIA UN NUOVO CAMPIONATO ▶",
+  "gate.buy": "ACQUISTA · {price}", "gate.soon": "IN ARRIVO", "gate.code.ph": "Codice di sblocco", "gate.code.btn": "SBLOCCA",
+  "gate.ok.unl": "Pass illimitato sbloccato. Inizia un campionato quando vuoi.", "gate.ok.champ": "Campionato sbloccato. È pronto a partire.", "gate.used": "Quel pass è già attivo su questo dispositivo.", "gate.bad": "Quel codice non è riconosciuto.",
+  "gate.fine": "La gara del giorno è sempre gratis. I pass sono salvati in questo browser: copia il codice di salvataggio in Impostazioni per portare un pass su un altro dispositivo.",
+  "offer.champ.k": "UNA STAGIONE", "offer.champ.b": "CAMPIONATO COMPLETO", "offer.champ.p": "Un campionato completo di 24 gare, al tuo ritmo.",
+  "offer.unl.k": "PIÙ CONVENIENTE", "offer.unl.b": "ILLIMITATO", "offer.unl.p": "Tutti i campionati, quante stagioni vuoi. Un solo pagamento.",
   "you": "TU", "round": "GARA {n}", "on": "SÌ", "off": "NO", "skip": "SALTA ▶▶",
   "logo.aria": "Torna al paddock", "sound.aria": "Attiva o disattiva l’audio",
   "tab.race": "GARA", "tab.standings": "MONDIALE", "tab.trophies": "TROFEI", "tab.settings": "IMPOSTAZIONI",
@@ -1453,6 +1575,16 @@ it: {
 },
 
 de: {
+  "mode.daily": "TAGESRENNEN", "mode.champ": "MEISTERSCHAFT", "ev.round.c": "MEISTERSCHAFT {s} · RENNEN {n}/{m}", "st.title.c": "MEISTERSCHAFT {s} · STAND", "share.season.c": "Meisterschaft {s}: {rank}, {pts} Pkt",
+  "next.ready": "NÄCHSTES RENNEN: {city} IST BEREIT", "next.done": "DAS WAR DAS LETZTE RENNEN",
+  "gate.h": "MEISTERSCHAFTSMODUS", "gate.p": "Alle 24 Rennen direkt nacheinander. Kein Warten auf morgen: Zielflagge sehen, und die nächste Startaufstellung steht bereit. Deine Punkte summieren sich zum Titelkampf gegen die 22 Fahrer.",
+  "gate.none": "DU BRAUCHST EINEN PASS, UM EINE MEISTERSCHAFT ZU STARTEN", "gate.credit1": "1 MEISTERSCHAFT STARTBEREIT", "gate.credits": "{n} MEISTERSCHAFTEN STARTBEREIT", "gate.unlimited": "UNLIMITED-PASS AKTIV",
+  "gate.done": "MEISTERSCHAFT BEENDET: DU BIST {rank} MIT {pts} PUNKTEN.", "gate.start": "MEISTERSCHAFT STARTEN ▶", "gate.again": "NEUE MEISTERSCHAFT STARTEN ▶",
+  "gate.buy": "KAUFEN · {price}", "gate.soon": "DEMNÄCHST", "gate.code.ph": "Freischaltcode", "gate.code.btn": "FREISCHALTEN",
+  "gate.ok.unl": "Unlimited-Pass freigeschaltet. Starte eine Meisterschaft, wann du willst.", "gate.ok.champ": "Meisterschaft freigeschaltet. Sie ist startbereit.", "gate.used": "Dieser Pass ist auf diesem Gerät schon aktiv.", "gate.bad": "Dieser Code wird nicht erkannt.",
+  "gate.fine": "Das Tagesrennen ist immer kostenlos. Pässe werden in diesem Browser gespeichert: Kopiere deinen Speichercode in den Optionen, um einen Pass auf ein anderes Gerät mitzunehmen.",
+  "offer.champ.k": "EINE SAISON", "offer.champ.b": "KOMPLETTE MEISTERSCHAFT", "offer.champ.p": "Eine komplette Meisterschaft über 24 Rennen, in deinem Tempo.",
+  "offer.unl.k": "BESTER PREIS", "offer.unl.b": "UNLIMITED", "offer.unl.p": "Jede Meisterschaft, so viele Saisons du willst. Eine Zahlung.",
   "you": "DU", "round": "RENNEN {n}", "on": "AN", "off": "AUS", "skip": "WEITER ▶▶",
   "logo.aria": "Zurück ins Fahrerlager", "sound.aria": "Ton an oder aus",
   "tab.race": "RENNEN", "tab.standings": "WM-STAND", "tab.trophies": "POKALE", "tab.settings": "OPTIONEN",
@@ -2270,9 +2402,45 @@ const Sound = (() => {
   };
 })();
 
+const raceKey = (d) => 'race:' + d, runKey = (d) => 'run:' + d;
+// ============================================================ PASSES ======
+/* Championship mode plays all 24 rounds back to back. A championship pass buys
+ * one championship; the unlimited pass buys as many as you like. The daily race
+ * is always free. Passes are unlocked by a code (or the link the payment page
+ * sends the buyer back to); the game only stores a fingerprint of each code. */
+function fingerprint(str) {
+  let h1 = 1779033703, h2 = 3144134277, h3 = 1013904242, h4 = 2773480762;
+  for (let i = 0, k; i < str.length; i++) { k = str.charCodeAt(i); h1 = h2 ^ Math.imul(h1 ^ k, 597399067); h2 = h3 ^ Math.imul(h2 ^ k, 2869860233); h3 = h4 ^ Math.imul(h3 ^ k, 951274213); h4 = h1 ^ Math.imul(h4 ^ k, 2716044179); }
+  h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067); h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233); h3 = Math.imul(h1 ^ (h2 >>> 17), 951274213); h4 = Math.imul(h2 ^ (h3 >>> 19), 2716044179);
+  h1 ^= (h2 ^ h3 ^ h4); h2 ^= h1; h3 ^= h1; h4 ^= h1;
+  return [h1, h2, h3, h4].map((h) => (h >>> 0).toString(16).padStart(8, '0')).join('');
+}
+const PAY = (typeof SITE !== 'undefined' && SITE.pay) || {};
+const getPass = () => Object.assign({ credits: 0, unlimited: false, used: [] }, store.get('pass', {}));
+const getChamp = () => Object.assign({ no: 0, active: false }, store.get('champ', {}));
+/* Returns 'championship' | 'unlimited' | 'used' | null for a typed or linked code. */
+function redeem(code) {
+  code = String(code || '').trim(); if (!code) return null;
+  const fp = fingerprint(code), pass = getPass();
+  const kind = PAY.unlimited && fp === PAY.unlimited.code ? 'unlimited' : PAY.championship && fp === PAY.championship.code ? 'championship' : null;
+  if (!kind) return null;
+  if (kind === 'unlimited') { if (pass.unlimited) return 'used'; pass.unlimited = true; }
+  else pass.credits++;
+  store.set('pass', pass); track('pass-' + kind);
+  return kind;
+}
+const CHAMP_BASE = (no) => 240000 + no * 240;            // virtual race days for championship rounds (a multiple of 24)
+const isChampDay = (day) => day > 240000;
+function champRound(no) { for (let r = 1; r <= N_TRACKS; r++) if (!store.get(raceKey(CHAMP_BASE(no) + r), null)) return r; return N_TRACKS + 1; }
+const champMode = () => store.get('mode', 'daily') === 'champ';
+const champLive = () => { const c = getChamp(); return champMode() && c.active && champRound(c.no) <= N_TRACKS; };
+/* The race day the paddock is showing: today, or the next round of the championship in progress. */
+function curDay() { const c = getChamp(); return champLive() ? CHAMP_BASE(c.no) + champRound(c.no) : dayIndex(); }
+const seasonNo = (day) => isChampDay(day) ? Math.round((day - 240000) / 240 - 0.5) : seasonOf(day);
+const roundText = (day) => t(isChampDay(day) ? 'ev.round.c' : 'ev.round', { n: roundOf(day), m: N_TRACKS, s: seasonNo(day) });
+
 // ============================================================ STATE =======
 const G = { day: dayIndex(), state: 'menu', team: null, plan: null, stage: 0, pos: 0, grid: 0, results: [], cushion: 0, hintUsed: false, clockLeft: 0, clockTotal: 25 };
-const raceKey = (d) => 'race:' + d, runKey = (d) => 'run:' + d;
 const teamById = (id) => GRID_TEAMS.find((x) => x.id === id) || GRID_TEAMS[0];
 const carOf = (d) => { const tm = teamById(d.team); return { c1: tm.c1, c2: tm.c2, code: d.code, helmet: tm.c2 }; };
 const myCar = () => ({ c1: G.team.c1, c2: G.team.c2, code: playerCode(), helmet: '#ffffff', me: true });
@@ -2378,10 +2546,11 @@ function buildPicker() {
   selectTeam(store.get('team', 'ferrari'));
 }
 function refreshMenu() {
-  G.day = dayIndex();
-  const season = seasonOf(G.day), round = roundOf(G.day), tr = TRACKS[round - 1];
+  G.day = curDay();
+  const round = roundOf(G.day), tr = TRACKS[round - 1];
+  renderGate();
   $('#roundLabel').textContent = t('round', { n: round });
-  $('#evRound').textContent = t('ev.round', { n: round, m: N_TRACKS, s: season });
+  $('#evRound').textContent = roundText(G.day);
   $('#evCity').textContent = tr.city.toUpperCase();
   $('#evCircuit').textContent = `${tr.name} · ${tr.country}`;
   $('#evLaps').textContent = tr.laps; $('#evCond').textContent = t('cond.' + tr.tod);
@@ -2399,7 +2568,7 @@ function refreshMenu() {
     start.hidden = false; start.textContent = t('btn.resume'); $('#reportBtn').hidden = true;
   } else { note.hidden = true; start.hidden = false; start.textContent = t('btn.start'); $('#reportBtn').hidden = true; }
   Scene.set({ mode: 'menu', flag: 'green' }); setAttract();
-  $('#heroRound').textContent = t('ev.round', { n: round, m: N_TRACKS, s: season }); $('#heroCity').textContent = tr.city.toUpperCase();
+  $('#heroRound').textContent = roundText(G.day); $('#heroCity').textContent = tr.city.toUpperCase();
   checkSeasonEnd();
 }
 function tickCountdown() {
@@ -2407,21 +2576,22 @@ function tickCountdown() {
   let s = Math.max(0, Math.floor((next - now) / 1000));
   const hh = String(Math.floor(s / 3600)).padStart(2, '0'); s %= 3600; const txt = `${hh}:${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   const nt = TRACKS[roundOf(G.day + 1) - 1].city;
-  ['#menuNext', '#sNext'].forEach((id) => { const el = $(id); if (el) el.textContent = t('next.in', { t: txt, city: nt.toUpperCase() }); });
+  const champ = isChampDay(G.day), last = roundOf(G.day) === N_TRACKS;
+  ['#menuNext', '#sNext'].forEach((id) => { const el = $(id); if (el) el.textContent = champ ? (last ? t('next.done') : t('next.ready', { city: nt.toUpperCase() })) : t('next.in', { t: txt, city: nt.toUpperCase() }); });
 }
-setInterval(() => { if (G.state !== 'race') { tickCountdown(); if (G.state === 'menu' && dayIndex() !== G.day) refreshMenu(); } }, 1000);
+setInterval(() => { if (G.state !== 'race') { tickCountdown(); if (G.state === 'menu' && curDay() !== G.day) refreshMenu(); } }, 1000);
 
 // ============================================================ STANDINGS ===
 /* The championship so far this season: every race day up to today. A day you
  * did not race is a DNS for you; the AI field still scores. */
 function standings(season = seasonOf(G.day)) {
-  const first = (season - 1) * N_TRACKS + 1, today = dayIndex();
+  const first = (season - 1) * N_TRACKS + 1, today = isChampDay(first) ? first + N_TRACKS : dayIndex();
   const rows = GRID_DRIVERS.map((d) => ({ d, name: d.name, team: teamById(d.team), pts: 0, wins: 0 }));
   const me = { me: true, name: playerName(), pts: 0, wins: 0, races: 0 };
   let done = 0;
   for (let day = first; day < first + N_TRACKS && day <= today; day++) {
     const rec = store.get(raceKey(day), null);
-    if (day === today && !rec) break;
+    if (!rec && (day === today || isChampDay(day))) break;      // a championship only counts the rounds you have run
     done++;
     const { run } = aiOrder(aiSim(day), 7);
     const order = run.map((c) => rows[c.i]);
@@ -2434,7 +2604,7 @@ function standings(season = seasonOf(G.day)) {
 }
 function renderStandings() {
   const st = standings(), season = st.season;
-  $('#stTitle').textContent = t('st.title', { s: season });
+  $('#stTitle').textContent = t(isChampDay(G.day) ? 'st.title.c' : 'st.title', { s: seasonNo(G.day) });
   $('#stSub').textContent = st.done ? t('st.sub', { n: st.done, m: N_TRACKS, rank: ordinal(st.me.rank).toUpperCase() }) : t('st.empty');
   const tb = $('#stBody'); tb.innerHTML = '';
   st.rows.forEach((r) => {
@@ -2467,7 +2637,7 @@ function radio(text) { const r = $('#radio'); if (!text) { r.hidden = true; retu
 function saveRun(live) { store.set(runKey(G.day), { team: G.team.id, stage: G.stage, pos: G.pos, grid: G.grid, results: G.results, cushion: G.cushion, hintUsed: G.hintUsed, live }); }
 
 function startRace() {
-  Sound.unlock(); G.day = dayIndex();
+  Sound.unlock(); G.day = curDay();
   if (store.get(raceKey(G.day), null)) { refreshMenu(); return; }
   G.plan = dayPlan(G.day);
   const run = store.get(runKey(G.day), null);
@@ -2650,6 +2820,10 @@ async function finish() {
   store.set(raceKey(G.day), rec); store.set(runKey(G.day), null);
   track('race-p' + (pos <= 3 ? pos : pos <= 10 ? 'points' : 'none'));
   checkRaceAch(rec);
+  if (isChampDay(G.day) && G.plan.round === N_TRACKS) {          // the championship is decided
+    const res = standings(), st = getStats(); track('championship-done');
+    if (res.me.rank === 1) { st.titles++; store.set('stats', st); unlock('champion'); }
+  }
   Scene.set({ mode: 'finish' }); Sound.flag(); if (pos <= 3) Scene.confetti(120);
   banner('P' + pos, t('flag.chq'), ''); $('#qcard').hidden = true; $('#result').hidden = true;
   await Scene.play('flag', {}, 2.2);
@@ -2663,7 +2837,7 @@ function renderSummary(rec, fresh) {
   const order = displayOrder(7, rec.pos), pts = POINTS[rec.pos - 1] || 0;
   const pod = order.slice(0, 3).map((e) => e.me ? { c1: G.team.c1, c2: G.team.c2, code: playerCode(), me: true } : { c1: e.c1, c2: teamById(e.d.team).c2, code: e.code });
   Scene.setTrack(G.plan.track); Scene.set({ mode: 'podium', podium: pod, flag: 'green' });
-  $('#sRound').textContent = t('ev.round', { n: G.plan.round, m: N_TRACKS, s: G.plan.season });
+  $('#sRound').textContent = roundText(G.day);
   $('#sCity').textContent = G.plan.track.city.toUpperCase();
   $('#sPos').textContent = 'P' + rec.pos; $('#sPts').textContent = t('s.pts', { n: pts });
   const tro = $('#sTrophy'); tro.hidden = rec.pos > 3; tro.className = 'trophy p' + rec.pos;
@@ -2690,7 +2864,7 @@ function leaveSummary() { refreshMenu(); screen('menu'); showTab('race'); }
 function shareText() {
   const rec = store.get(raceKey(G.day), null); if (!rec) return '';
   const plan = dayPlan(G.day), st = standings(), e = rec.results.map((r) => TIER_EMOJI[r.tier]);
-  return `🏁 LIGHTS OUT · ${t('round', { n: plan.round })} · ${plan.track.city}\n${t('share.line', { g: rec.grid, p: rec.pos, pts: POINTS[rec.pos - 1] || 0 })}\nQ ${e[0]}  ${e.slice(1).join('')}\n${t('share.season', { s: plan.season, rank: ordinal(st.me.rank), pts: st.me.pts })}${siteUrl() ? '\n' + siteUrl() : ''}`;
+  return `🏁 LIGHTS OUT · ${t('round', { n: plan.round })} · ${plan.track.city}\n${t('share.line', { g: rec.grid, p: rec.pos, pts: POINTS[rec.pos - 1] || 0 })}\nQ ${e[0]}  ${e.slice(1).join('')}\n${t(isChampDay(G.day) ? 'share.season.c' : 'share.season', { s: seasonNo(G.day), rank: ordinal(st.me.rank), pts: st.me.pts })}${siteUrl() ? '\n' + siteUrl() : ''}`;
 }
 async function share() {
   const txt = shareText(); let ok = false;
@@ -2705,7 +2879,7 @@ const ACH = ['points', 'podium', 'win', 'front_row', 'pole', 'grand_slam', 'back
 const NAME_ACH = { 'Lewis Hamilton': 'hammer', 'Max Verstappen': 'supermax', 'Fernando Alonso': 'elplan', 'Kimi Räikkönen': 'iceman', 'Carlos Sainz': 'smooth', 'Michael Schumacher': 'schumi', 'Minardi': 'minardi' };
 const getStats = () => Object.assign({ races: 0, wins: 0, pods: 0, pts: 0, p1: 0, p2: 0, p3: 0, titles: 0, streak: 0, lastDay: 0, teams: [], seasonsDone: [] }, store.get('stats', {}));
 const pending = [];
-function unlock(id) { const a = store.get('ach', {}); if (a[id]) return; a[id] = G.day; store.set('ach', a); pending.push(id); renderTrophies(); }
+function unlock(id) { const a = store.get('ach', {}); if (a[id]) return; a[id] = dayIndex(); store.set('ach', a); pending.push(id); renderTrophies(); }
 function flushToasts() {
   pending.splice(0).forEach((id, i) => setTimeout(() => {
     const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = '<div class="medal">★</div><div><span></span><b></b></div>';
@@ -2730,7 +2904,7 @@ function checkAnswerAch(r, q) {
 function checkRaceAch(rec) {
   const st = getStats(), pts = POINTS[rec.pos - 1] || 0;
   st.races++; st.pts += pts; if (rec.pos === 1) { st.wins++; st.p1++; } if (rec.pos === 2) st.p2++; if (rec.pos === 3) st.p3++; if (rec.pos <= 3) st.pods++;
-  st.streak = st.lastDay === G.day - 1 ? st.streak + 1 : st.lastDay === G.day ? st.streak : 1; st.lastDay = G.day;
+  if (!isChampDay(G.day)) { st.streak = st.lastDay === G.day - 1 ? st.streak + 1 : st.lastDay === G.day ? st.streak : 1; st.lastDay = G.day; }
   if (!st.teams.includes(rec.team)) st.teams.push(rec.team);
   store.set('stats', st);
   if (rec.pos <= 10) unlock('points'); if (rec.pos <= 3) unlock('podium'); if (rec.pos === 1) unlock('win');
@@ -2764,6 +2938,48 @@ function renderTrophies() {
     el.innerHTML = `<div class="medal">${got ? '★' : '?'}</div><div><b></b><p></p>${got ? `<small>${esc(t('ach.when', { n: got }))}</small>` : ''}</div>`;
     el.querySelector('b').textContent = t('a.' + id); el.querySelector('p').textContent = t('a.' + id + '.d'); g.appendChild(el);
   });
+}
+
+// ============================================================ CHAMPIONSHIP GATE
+function setMode(m) { store.set('mode', m); refreshMenu(); }
+function renderGate() {
+  const champ = champMode(), live = champLive(), pass = getPass(), c = getChamp();
+  $$('.mode').forEach((b) => { const on = (b.dataset.mode === 'champ') === champ; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+  const gate = $('#champGate'); gate.hidden = !champ || live; $('#raceUI').hidden = champ && !live;
+  if (gate.hidden) return;
+  const done = c.no > 0 && champRound(c.no) > N_TRACKS, entitled = pass.unlimited || pass.credits > 0;
+  let status = '';
+  if (done) { const res = standings(seasonOf(CHAMP_BASE(c.no) + 1)); status = t('gate.done', { rank: ordinal(res.me.rank).toUpperCase(), pts: res.me.pts }) + ' '; }
+  status += pass.unlimited ? t('gate.unlimited') : pass.credits > 0 ? t(pass.credits === 1 ? 'gate.credit1' : 'gate.credits', { n: pass.credits }) : t('gate.none');
+  $('#gateStatus').textContent = status;
+  $('#champStartBtn').hidden = !entitled; $('#champStartBtn').textContent = t(done ? 'gate.again' : 'gate.start');
+  $('#gateOffers').hidden = pass.unlimited;
+  [['#buyChamp', PAY.championship], ['#buyUnl', PAY.unlimited]].forEach(([id, o]) => {
+    const b = $(id), ok = !!(o && o.link);
+    b.disabled = !ok; b.textContent = ok ? t('gate.buy', { price: o.price || '' }) : t('gate.soon');
+  });
+  $('#priceChamp').textContent = (PAY.championship && PAY.championship.price) || '£2'; $('#priceUnl').textContent = (PAY.unlimited && PAY.unlimited.price) || '£5';
+}
+$$('.mode').forEach((b) => b.addEventListener('click', () => { Sound.unlock(); Sound.select(); setMode(b.dataset.mode); }));
+$('#champStartBtn').addEventListener('click', () => {
+  const pass = getPass(), c = getChamp();
+  if (!pass.unlimited) { if (pass.credits < 1) return; pass.credits--; store.set('pass', pass); }
+  store.set('champ', { no: c.no + 1, active: true }); track('championship-start'); Sound.fanfare(); refreshMenu();
+});
+[['#buyChamp', 'championship'], ['#buyUnl', 'unlimited']].forEach(([id, k]) => $(id).addEventListener('click', () => { const o = PAY[k]; if (o && o.link) { track('buy-' + k); window.open(o.link, '_blank', 'noopener'); } }));
+function tryCode(code, msgEl) {
+  const r = redeem(code);
+  if (msgEl) msgEl.textContent = t(r === 'unlimited' ? 'gate.ok.unl' : r === 'championship' ? 'gate.ok.champ' : r === 'used' ? 'gate.used' : 'gate.bad');
+  if (r === 'unlimited' || r === 'championship') { Sound.fanfare(); store.set('mode', 'champ'); refreshMenu(); }
+  return r;
+}
+$('#codeForm').addEventListener('submit', (e) => { e.preventDefault(); tryCode($('#codeIn').value, $('#codeMsg')); $('#codeIn').value = ''; });
+/* Coming back from the payment page: ...?unlock=CODE (or #unlock=CODE). Apply it once, then clean the address. */
+function checkUnlockLink() {
+  const m = /[?&#]unlock=([A-Za-z0-9_-]+)/.exec(location.search + location.hash); if (!m) return;
+  try { history.replaceState(null, '', location.pathname); } catch (e) { /* not allowed here */ }
+  const r = redeem(m[1]);
+  if (r === 'unlimited' || r === 'championship') { store.set('mode', 'champ'); setTimeout(() => { $('#codeMsg').textContent = t(r === 'unlimited' ? 'gate.ok.unl' : 'gate.ok.champ'); Sound.fanfare(); }, 300); }
 }
 
 // ============================================================ TABS / SETTINGS
@@ -2806,7 +3022,7 @@ function readSaveCode(code) {
   try {
     const b64 = m[1].replace(/-/g, '+').replace(/_/g, '/'), bytes = Uint8Array.from(atob(b64 + '==='.slice((b64.length + 3) % 4)), (c) => c.charCodeAt(0));
     const obj = JSON.parse(new TextDecoder().decode(bytes)); if (!obj || obj.v !== 1 || typeof obj.data !== 'object') return null;
-    const ok = /^(race:\d+|ach|stats|team|name|lang|sound)$/, data = {}; Object.entries(obj.data).forEach(([k, v]) => { if (ok.test(k)) data[k] = v; }); return data;
+    const ok = /^(race:\d+|ach|stats|team|name|lang|sound|pass|champ|mode)$/, data = {}; Object.entries(obj.data).forEach(([k, v]) => { if (ok.test(k)) data[k] = v; }); return data;
   } catch (e) { return null; }
 }
 $('#saveCopyBtn').addEventListener('click', async () => {
@@ -2850,10 +3066,11 @@ $('#homeLogo').addEventListener('click', () => {
 document.addEventListener('keydown', (e) => { if (e.key !== 'Enter' || G.state !== 'race') return; if (!$('#result').hidden) { e.preventDefault(); advance(); } else if (Scene.playing()) { e.preventDefault(); Scene.skip(); } });
 
 // boot
+checkUnlockLink();
 Scene.init($('#scene'));
 Scene.onFrame(miniHook);
 buildPicker(); applyLang(); soundIcon(); screen('menu');
-window.LightsOut = { setDay(n) { dayOverride = n; refreshMenu(); }, G, dayPlan, aiSim, aiOrder, standings, matchAnswer, prep, QUESTIONS, qText, t, showTab, Scene, rarity, tierOf };
+window.LightsOut = { fingerprint, redeem, getPass, getChamp, curDay, setDay(n) { dayOverride = n; refreshMenu(); }, G, dayPlan, aiSim, aiOrder, standings, matchAnswer, prep, QUESTIONS, qText, t, showTab, Scene, rarity, tierOf };
 })();
 
 </script>
