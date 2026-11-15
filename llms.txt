@@ -1,0 +1,14 @@
+# Lights Out
+
+> Lights Out is a free daily F1 trivia race game in the browser. Each day there is a new race at a real circuit: one question sets your grid slot, then seven race-moment questions decide where you finish. Correct answers that fewer players would give ("rare" answers) gain more places.
+
+- Free to play in any web browser; no download or account needed
+- Available in English, Spanish, French, Portuguese, Italian and German
+- A new circuit every day, a 24-race season, points, standings and 28 achievements
+- Unofficial fan game; not affiliated with Formula 1, the FIA or any team or driver
+
+## Links
+
+- [Play Lights Out](https://lightsoutgame.co.uk/): today's race
+- [TikTok @lightsout.io](https://www.tiktok.com/@lightsout.io): daily F1 trivia videos
+- [Instagram @lightsout.io](https://www.instagram.com/lightsout.io/)
